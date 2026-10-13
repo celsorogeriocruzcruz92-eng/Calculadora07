@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Celso</title>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #101827, #263d62);
+      font-family: Arial, sans-serif;
+    }
+    
+    .celular {
+      width: 320px;
+      padding: 15px;
+      border: 4px solid #526174;
+      border-radius: 38px;
+      background: #080b10;
+      box-shadow: 0 20px 50px #0008;
+    }
+    
+    .camera {
+      width: 75px;
+      height: 8px;
+      border-radius: 10px;
+      background: #252c35;
+      margin: 0 auto 20px;
+    }
+    
+    .marca {
+      color: #57d8ff;
+      text-align: center;
+      font-weight: bold;
+      letter-spacing: 3px;
+      margin-bottom: 12px;
+    }
+    
+    #visor {
+      width: 100%;
+      height: 105px;
+      border: none;
+      outline: none;
+      border-radius: 14px;
+      background: #111b29;
+      color: white;
+      text-align: right;
+      font-size: 36px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .botoes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 9px;
+    }
+    
+    button {
+      height: 57px;
+      border: none;
+      border-radius: 18px;
+      background: #202a39;
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #10151e;
+    }
+    
+    button:active {
+      transform: scale(0.94);
+    }
+    
+    .operador {
+      background: #176fbd;
+    }
+    
+    .especial {
+      background: #465365;
+    }
+    
+    .igual {
+      background: #00b894;
+      color: #071b16;
+      font-weight: bold;
+    }
+    
+    .zero {
+      grid-column: span 2;
+    }
+    
+    .home {
+      width: 90px;
+      height: 5px;
+      background: #697381;
+      border-radius: 10px;
+      margin: 20px auto 3px;
+    }
+    
+    .rodape {
+      color: #8795a8;
+      text-align: center;
+      font-size: 11px;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  
+  <div class="celular">
+    <div class="camera"></div>
+    <div class="marca">CELSO CALC</div>
+    
+    <input id="visor" value="0" readonly>
+    
+    <div class="botoes">
+      <button class="especial" onclick="limpar()">AC</button>
+      <button class="especial" onclick="apagar()">⌫</button>
+      <button class="especial" onclick="adicionar('%')">%</button>
+      <button class="operador" onclick="adicionar('/')">÷</button>
+      
+      <button onclick="adicionar('7')">7</button>
+      <button onclick="adicionar('8')">8</button>
+      <button onclick="adicionar('9')">9</button>
+      <button class="operador" onclick="adicionar('*')">×</button>
+      
+      <button onclick="adicionar('4')">4</button>
+      <button onclick="adicionar('5')">5</button>
+      <button onclick="adicionar('6')">6</button>
+      <button class="operador" onclick="adicionar('-')">−</button>
+      
+      <button onclick="adicionar('1')">1</button>
+      <button onclick="adicionar('2')">2</button>
+      <button onclick="adicionar('3')">3</button>
+      <button class="operador" onclick="adicionar('+')">+</button>
+      
+      <button class="zero" onclick="adicionar('0')">0</button>
+      <button onclick="adicionar('.')">.</button>
+      <button class="igual" onclick="calcular()">=</button>
+    </div>
+    
+    <div class="rodape">Calculadora Android • Versão 1.0</div>
+    <div class="home"></div>
+  </div>
+  
+  <script>
+    const visor = document.getElementById("visor");
+    let expressao = "";
+    let terminou = false;
+    
+    function mostrar() {
+      visor.value = expressao || "0";
+    }
+    
+    function adicionar(valor) {
+      if (terminou) {
+        if ("0123456789.".includes(valor)) {
+          expressao = "";
+        }
+        terminou = false;
+      }
+      
+      if (expressao.length >= 30) return;
+      
+      if ("+-*/%".includes(valor) &&
+        expressao === "" && valor !== "-") return;
+      
+      expressao += valor;
+      mostrar();
+    }
+    
+    function limpar() {
+      expressao = "";
+      terminou = false;
+      mostrar();
+    }
+    
+    function apagar() {
+      expressao = expressao.slice(0, -1);
+      terminou = false;
+      mostrar();
+    }
+    
+    function calcular() {
+      if (!expressao) return;
+      
+      try {
+        if (!/^[0-9+\-*/%.() ]+$/.test(expressao)) {
+          throw new Error("Expressão inválida");
+        }
+        
+        const resultado = Function(
+          '"use strict"; return (' + expressao + ')'
+        )();
+        
+        if (!Number.isFinite(resultado)) {
+          throw new Error("Resultado inválido");
+        }
+        
+        expressao = String(
+          Number(resultado.toPrecision(12))
+        );
+        
+        visor.value = expressao;
+        terminou = true;
+      } catch (erro) {
+        visor.value = "Erro";
+        expressao = "";
+        terminou = true;
+      }
+    }
+  </script>
+  
+</body>
+
+</html>
